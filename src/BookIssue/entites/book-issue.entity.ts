@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   JoinColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Book } from '../../Books/entities/book.entity';
 import { Student } from '../../Students/entities/student.entity';
@@ -44,8 +45,10 @@ export class BookIssue {
   @CreateDateColumn()
   created_at: Date; // Timestamp for when the record was created
 
-  @Column({ nullable: true })
-  updated_at: Date; // Timestamp for when the record was last updated
+  // @Column({ nullable: true })
+  // updated_at: Date; // Timestamp for when the record was last updated
+  @UpdateDateColumn() // Automatically updates on each update
+  updated_at: Date;
 
   @DeleteDateColumn({ nullable: true })
   deleted_at: Date; // Timestamp for when the record was deleted

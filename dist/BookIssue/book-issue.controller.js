@@ -34,11 +34,7 @@ let BookIssueController = class BookIssueController {
         }
     }
     async findOne(id) {
-        const bookIssue = await this.bookIssueService.findOne(+id);
-        if (!bookIssue) {
-            throw new common_1.NotFoundException(`Book issue with ID ${id} not found`);
-        }
-        return bookIssue;
+        return this.bookIssueService.findOne(+id);
     }
     async findAll() {
         return this.bookIssueService.findAll();
@@ -79,7 +75,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BookIssueController.prototype, "findStudentHistory", null);
 __decorate([
-    (0, common_1.Post)('/return'),
+    (0, common_1.Patch)('/return'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

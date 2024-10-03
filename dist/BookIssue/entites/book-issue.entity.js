@@ -59,7 +59,7 @@ __decorate([
     __metadata("design:type", Date)
 ], BookIssue.prototype, "created_at", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], BookIssue.prototype, "updated_at", void 0);
 __decorate([

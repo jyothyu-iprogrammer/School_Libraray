@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { BookIssue } from './entites/book-issue.entity';
+import { Repository, EntityManager } from 'typeorm';
+import { BookIssue } from '../BookIssue/entites/book-issue.entity';
 import { CreateBookIssueDto } from './dto/create-book-issue.dto';
 import { Book } from '../Books/entities/book.entity';
 import { Student } from '../Students/entities/student.entity';
@@ -13,93 +13,65 @@ export class BookIssueService {
     private readonly bookIssueRepository: Repository<BookIssue>,
 
     @InjectRepository(Book)
-    private readonly bookRepository: Repository<Book>, // Ensure correct injection
+    private readonly bookRepository: Repository<Book>,
 
     @InjectRepository(Student)
     private readonly studentRepository: Repository<Student>,
-  ) { }
+  ) {}
 
-  // async create(createBookIssueDtos: CreateBookIssueDto[]): Promise<BookIssue[]> {
-  //   const bookIssues = [];
-
-  //   for (const dto of createBookIssueDtos) {
-  //     const existingIssue = await this.bookIssueRepository.findOne({
-  //       where: {
-  //         student: { id: dto.student_id },
-  //         returnDate: null // Ensure the book is currently issued
-  //       }
-  //     });
-
-  //     if (existingIssue) {
-  //       throw new BadRequestException("A student can only issue one book at a time.");
-  //     }
-
-  //     const bookIssue = this.bookIssueRepository.create({
-  //       ...dto,
-  //       issueDate: new Date(dto.issueDate),
-  //       book: { id: dto.book_id },
-  //       student: { id: dto.student_id },
-  //     });
-
-  //     bookIssues.push(bookIssue);
-  //   }
-
-  //   return await this.bookIssueRepository.save(bookIssues);
-  // }
-
-
-  // Update return date for a book issue
-  // async returnBook(issueId: number, returnDate: string): Promise<BookIssue> {
-  //   const bookIssue = await this.bookIssueRepository.findOne({ where: { id: issueId } });
-
-  //   if (!bookIssue) {
-  //     throw new NotFoundException('Book issue record not found');
-  //   }
-
-  //   bookIssue.returnDate = new Date(returnDate); // Set the return date
-  //   return this.bookIssueRepository.save(bookIssue); // Save the updated record
-  // }
+  // Method to issue a book to a student
   async create(createBookIssueDto: CreateBookIssueDto): Promise<BookIssue> {
-    const existingIssue = await this.bookIssueRepository.findOne({
-      where: {
+    return await this.bookIssueRepository.manager.transaction(async (entityManager: EntityManager) => {
+      // Check if the student has an active book issue (i.e., where returnDate is null)
+      const activeIssue = await entityManager.findOne(BookIssue, {
+        where: {
+          student: { id: createBookIssueDto.student_id },
+          returnDate: null, // Only consider books that have not been returned
+        },
+      });
+
+      // If the student has an active book issue, prevent them from issuing another book
+      if (activeIssue) {
+        throw new BadRequestException(
+          'A student can only issue one book at a time until the previous book is returned.'
+        );
+      }
+
+      // Create a new book issue record since the student has no active issues
+      const newBookIssue = entityManager.create(BookIssue, {
+        ...createBookIssueDto,
+        issueDate: new Date(), // Set issue date to the current date
+        returnDate: null, // A new book issue will not have a return date
+        book: { id: createBookIssueDto.book_id },
         student: { id: createBookIssueDto.student_id },
-        returnDate: null, // Ensure the book is currently issued
-      },
+      });
+
+      return await entityManager.save(newBookIssue); // Save the new book issue
     });
-
-    if (existingIssue) {
-      throw new BadRequestException("A student can only issue one book at a time.");
-    }
-
-    const bookIssue = this.bookIssueRepository.create({
-      ...createBookIssueDto,
-      issueDate: new Date(createBookIssueDto.issueDate),
-      book: { id: createBookIssueDto.book_id },
-      student: { id: createBookIssueDto.student_id },
-    });
-
-    return await this.bookIssueRepository.save(bookIssue);
   }
 
+  // Return a book
   async returnBook(studentId: number, bookId: number): Promise<BookIssue> {
-    const existingIssue = await this.bookIssueRepository.findOne({
-      where: {
-        student: { id: studentId },
-        book: { id: bookId },
-        returnDate: null, // Ensure the book is currently issued
-      },
+    return await this.bookIssueRepository.manager.transaction(async (entityManager: EntityManager) => {
+      const existingIssue = await entityManager.findOne(BookIssue, {
+        where: {
+          student: { id: studentId },
+          book: { id: bookId },
+          returnDate: null, // Look for an unreturned book issue
+        },
+      });
+
+      if (!existingIssue) {
+        throw new NotFoundException("No active book issue found for the student.");
+      }
+
+      // Update the return date to mark the book as returned
+      existingIssue.returnDate = new Date();
+      return await entityManager.save(existingIssue); // Save the updated book issue
     });
-
-    if (!existingIssue) {
-      throw new NotFoundException("No active book issue found for the student.");
-    }
-
-    // Update the return date
-    existingIssue.returnDate = new Date();
-    return await this.bookIssueRepository.save(existingIssue);
   }
-  
 
+  // Method to find one book issue by ID
   async findOne(id: number): Promise<BookIssue> {
     const bookIssue = await this.bookIssueRepository.findOne({
       where: { id },
@@ -113,14 +85,15 @@ export class BookIssueService {
     return bookIssue;
   }
 
+  // Method to find all book issues
   async findAll(): Promise<BookIssue[]> {
     return this.bookIssueRepository.find({ relations: ['book', 'student'] });
   }
 
-  // New method to find a student's library history
+  // Method to find a student's library history
   async findStudentHistory(studentId: number): Promise<BookIssue[]> {
     return this.bookIssueRepository.find({
-      where: { student: { id: studentId } },  // Ensure this matches your entity structure
+      where: { student: { id: studentId } },
       relations: ['book', 'student'],
     });
   }

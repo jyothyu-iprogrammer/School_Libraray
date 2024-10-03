@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get,Patch, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Param, NotFoundException } from '@nestjs/common';
 import { BookIssueService } from './book-issue.service';
 import { CreateBookIssueDto } from './dto/create-book-issue.dto';
 import { BookIssue } from '../BookIssue/entites/book-issue.entity';
@@ -28,11 +28,7 @@ export class BookIssueController {
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<BookIssue> {
-    const bookIssue = await this.bookIssueService.findOne(+id);
-    if (!bookIssue) {
-      throw new NotFoundException(`Book issue with ID ${id} not found`);
-    }
-    return bookIssue;
+    return this.bookIssueService.findOne(+id);
   }
 
   @Get()
@@ -46,9 +42,9 @@ export class BookIssueController {
     return this.bookIssueService.findStudentHistory(+studentId);
   }
 
-   @Post('/return')
+  // Updated to use PATCH for returning a book
+  @Patch('/return')
   async return(@Body() returnDto: { student_id: number; book_id: number }): Promise<BookIssue> {
     return this.bookIssueService.returnBook(returnDto.student_id, returnDto.book_id);
   }
-
 }

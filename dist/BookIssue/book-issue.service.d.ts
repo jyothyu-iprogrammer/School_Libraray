@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { BookIssue } from './entites/book-issue.entity';
+import { BookIssue } from '../BookIssue/entites/book-issue.entity';
 import { CreateBookIssueDto } from './dto/create-book-issue.dto';
 import { Book } from '../Books/entities/book.entity';
 import { Student } from '../Students/entities/student.entity';

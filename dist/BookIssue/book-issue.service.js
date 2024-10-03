@@ -16,7 +16,7 @@ exports.BookIssueService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const book_issue_entity_1 = require("./entites/book-issue.entity");
+const book_issue_entity_1 = require("../BookIssue/entites/book-issue.entity");
 const book_entity_1 = require("../Books/entities/book.entity");
 const student_entity_1 = require("../Students/entities/student.entity");
 let BookIssueService = class BookIssueService {
@@ -26,31 +26,35 @@ let BookIssueService = class BookIssueService {
         this.studentRepository = studentRepository;
     }
     async create(createBookIssueDto) {
-        const existingIssue = await this.bookIssueRepository.findOne({
-            where: {
-                student: { id: createBookIssueDto.student_id },
-                returnDate: null,
-            },
+        return await this.bookIssueRepository.manager.transaction(async (entityManager) => {
+            const activeIssue = await entityManager.findOne(book_issue_entity_1.BookIssue, {
+                where: {
+                    student: { id: createBookIssueDto.student_id },
+                    returnDate: null,
+                },
+            });
+            if (activeIssue) {
+                throw new common_1.BadRequestException('A student can only issue one book at a time until the previous book is returned.');
+            }
+            const newBookIssue = entityManager.create(book_issue_entity_1.BookIssue, Object.assign(Object.assign({}, createBookIssueDto), { issueDate: new Date(), returnDate: null, book: { id: createBookIssueDto.book_id }, student: { id: createBookIssueDto.student_id } }));
+            return await entityManager.save(newBookIssue);
         });
-        if (existingIssue) {
-            throw new common_1.BadRequestException("A student can only issue one book at a time.");
-        }
-        const bookIssue = this.bookIssueRepository.create(Object.assign(Object.assign({}, createBookIssueDto), { issueDate: new Date(createBookIssueDto.issueDate), book: { id: createBookIssueDto.book_id }, student: { id: createBookIssueDto.student_id } }));
-        return await this.bookIssueRepository.save(bookIssue);
     }
     async returnBook(studentId, bookId) {
-        const existingIssue = await this.bookIssueRepository.findOne({
-            where: {
-                student: { id: studentId },
-                book: { id: bookId },
-                returnDate: null,
-            },
+        return await this.bookIssueRepository.manager.transaction(async (entityManager) => {
+            const existingIssue = await entityManager.findOne(book_issue_entity_1.BookIssue, {
+                where: {
+                    student: { id: studentId },
+                    book: { id: bookId },
+                    returnDate: null,
+                },
+            });
+            if (!existingIssue) {
+                throw new common_1.NotFoundException("No active book issue found for the student.");
+            }
+            existingIssue.returnDate = new Date();
+            return await entityManager.save(existingIssue);
         });
-        if (!existingIssue) {
-            throw new common_1.NotFoundException("No active book issue found for the student.");
-        }
-        existingIssue.returnDate = new Date();
-        return await this.bookIssueRepository.save(existingIssue);
     }
     async findOne(id) {
         const bookIssue = await this.bookIssueRepository.findOne({
