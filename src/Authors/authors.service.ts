@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Author } from './enitites/author.entity'; // Ensure correct path
@@ -16,11 +16,6 @@ export class AuthorsService {
     return this.authorsRepository.save(author); // Automatically sets only created_at
   }
 
-  async update(id: number, updateAuthorDto: { name: string }): Promise<Author> {
-    await this.authorsRepository.update(id, { ...updateAuthorDto, updated_at: new Date() });
-    return this.authorsRepository.findOne({ where: { id } });
-  }
-
   async findAll(): Promise<Author[]> {
     return this.authorsRepository.find({ relations: ['books'] });
   }
@@ -28,4 +23,12 @@ export class AuthorsService {
   async findByName(name: string): Promise<Author[]> {
     return this.authorsRepository.find({ where: { name }, relations: ['books'] });
   }
+
+  // async update(id: number, name: string): Promise<Author> {
+  //   const result = await this.authorsRepository.update(id, { name, updated_at: new Date() });
+  //   if (result.affected === 0) {
+  //     throw new NotFoundException(`Author not found with id: ${id}`);
+  //   }
+  //   return this.authorsRepository.findOne({ where: { id } });
+  // }
 }

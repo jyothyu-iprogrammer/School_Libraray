@@ -21,8 +21,8 @@ export class AuthorsController {
     return this.authorsService.findByName(name);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() updateAuthorDto: CreateAuthorDto) {
-    return this.authorsService.update(id, updateAuthorDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: number, @Body() updateAuthorDto: CreateAuthorDto) {
+  //   return this.authorsService.update(id, updateAuthorDto);
+  // }
 }

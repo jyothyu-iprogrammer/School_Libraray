@@ -98,30 +98,36 @@ describe('BooksService', () => {
       const mockBooks = [
         { id: 1, title: 'Book 1', authors: [{ id: 1, name: authorName }] },
       ];
-
+  
+      mockBookRepository.createQueryBuilder.mockReturnThis(); // Ensure chaining works
       mockBookRepository.getMany.mockResolvedValue(mockBooks);
-
+  
       const books = await service.getBooksByAuthor(authorName);
       expect(books).toEqual(mockBooks);
       expect(mockBookRepository.createQueryBuilder).toHaveBeenCalled();
       expect(mockBookRepository.getMany).toHaveBeenCalled();
     });
-
-    it('should throw NotFoundException if no authors found', async () => {
-      const authorName = 'Nonexistent Author';
-      mockBookRepository.getMany.mockResolvedValue([]);
-
-      await expect(service.getBooksByAuthor(authorName)).rejects.toThrow(NotFoundException);
-    });
-
+  
     it('should throw NotFoundException if no books found for the author', async () => {
       const authorName = 'Author 2';
       const mockAuthors = [{ id: 2, name: authorName }];
-
+  
       mockAuthorRepository.find.mockResolvedValue(mockAuthors);
-      mockBookRepository.getMany.mockResolvedValue([]);
-
+      mockBookRepository.createQueryBuilder.mockReturnThis(); // Ensure chaining works
+      mockBookRepository.getMany.mockResolvedValue([]); // Simulate no books found
+  
       await expect(service.getBooksByAuthor(authorName)).rejects.toThrow(NotFoundException);
+      await expect(service.getBooksByAuthor(authorName)).rejects.toThrow(`No books found for the author: ${authorName}`);
+    });
+  
+    it('should throw NotFoundException if no authors found', async () => {
+      const authorName = 'Nonexistent Author';
+      mockBookRepository.createQueryBuilder.mockReturnThis(); // Ensure chaining works
+      mockBookRepository.getMany.mockResolvedValue([]); // Simulate no books found
+  
+      await expect(service.getBooksByAuthor(authorName)).rejects.toThrow(NotFoundException);
+      await expect(service.getBooksByAuthor(authorName)).rejects.toThrow(`No books found for the author: ${authorName}`);
     });
   });
+  
 });

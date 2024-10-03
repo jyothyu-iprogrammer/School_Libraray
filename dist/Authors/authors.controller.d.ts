@@ -6,5 +6,4 @@ export declare class AuthorsController {
     create(createAuthorDto: CreateAuthorDto): Promise<import("./enitites/author.entity").Author>;
     findAll(): Promise<import("./enitites/author.entity").Author[]>;
     findByName(name: string): Promise<import("./enitites/author.entity").Author[]>;
-    update(id: number, updateAuthorDto: CreateAuthorDto): Promise<import("./enitites/author.entity").Author>;
 }

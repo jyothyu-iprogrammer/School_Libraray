@@ -25,10 +25,6 @@ let AuthorsService = class AuthorsService {
         const author = this.authorsRepository.create(createAuthorDto);
         return this.authorsRepository.save(author);
     }
-    async update(id, updateAuthorDto) {
-        await this.authorsRepository.update(id, Object.assign(Object.assign({}, updateAuthorDto), { updated_at: new Date() }));
-        return this.authorsRepository.findOne({ where: { id } });
-    }
     async findAll() {
         return this.authorsRepository.find({ relations: ['books'] });
     }

@@ -20,35 +20,64 @@ export class BookIssueService {
   ) {}
 
   // Method to issue a book to a student
+  // async create(createBookIssueDto: CreateBookIssueDto): Promise<BookIssue> {
+  //   return await this.bookIssueRepository.manager.transaction(async (entityManager: EntityManager) => {
+  //     // Check if the student has an active book issue (i.e., where returnDate is null)
+  //     const activeIssue = await entityManager.findOne(BookIssue, {
+  //       where: {
+  //         student: { id: createBookIssueDto.student_id },
+  //         returnDate: null, // Only consider books that have not been returned
+  //       },
+  //     });
+
+  //     // If the student has an active book issue, prevent them from issuing another book
+  //     if (activeIssue) {
+  //       throw new BadRequestException(
+  //         'A student can only issue one book at a time until the previous book is returned.'
+  //       );
+  //     }
+
+  //     // Create a new book issue record since the student has no active issues
+  //     const newBookIssue = entityManager.create(BookIssue, {
+  //       ...createBookIssueDto,
+  //       issueDate: new Date(), // Set issue date to the current date
+  //       returnDate: null, // A new book issue will not have a return date
+  //       book: { id: createBookIssueDto.book_id },
+  //       student: { id: createBookIssueDto.student_id },
+  //     });
+
+  //     return await entityManager.save(newBookIssue); // Save the new book issue
+  //   });
+  // }
   async create(createBookIssueDto: CreateBookIssueDto): Promise<BookIssue> {
     return await this.bookIssueRepository.manager.transaction(async (entityManager: EntityManager) => {
       // Check if the student has an active book issue (i.e., where returnDate is null)
       const activeIssue = await entityManager.findOne(BookIssue, {
         where: {
           student: { id: createBookIssueDto.student_id },
-          returnDate: null, // Only consider books that have not been returned
+          returnDate: null,
         },
       });
-
-      // If the student has an active book issue, prevent them from issuing another book
+  
       if (activeIssue) {
         throw new BadRequestException(
           'A student can only issue one book at a time until the previous book is returned.'
         );
       }
-
+  
       // Create a new book issue record since the student has no active issues
       const newBookIssue = entityManager.create(BookIssue, {
-        ...createBookIssueDto,
-        issueDate: new Date(), // Set issue date to the current date
-        returnDate: null, // A new book issue will not have a return date
         book: { id: createBookIssueDto.book_id },
         student: { id: createBookIssueDto.student_id },
+        issueDate: new Date(createBookIssueDto.issueDate), // Convert string to Date
+        returnDate: createBookIssueDto.returnDate ? new Date(createBookIssueDto.returnDate) : null,
+        fine_collected: createBookIssueDto.fine_collected,
       });
-
-      return await entityManager.save(newBookIssue); // Save the new book issue
+  
+      return await entityManager.save(newBookIssue);
     });
   }
+  
 
   // Return a book
   async returnBook(studentId: number, bookId: number): Promise<BookIssue> {

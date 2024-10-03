@@ -47,18 +47,23 @@ export class BooksService {
   // Method to get books by author name
   async getBooksByAuthor(authorName: string): Promise<Book[]> {
     console.log('Searching for books by author:', authorName);
-  
+
     const books = await this.booksRepository.createQueryBuilder('book')
       .innerJoinAndSelect('book.authors', 'author') // Join authors
       .where('author.name LIKE :authorName', { authorName: `%${authorName}%` }) // Allow partial match
       .andWhere('book.deleted_at IS NULL') // Ensure the book is not soft-deleted
       .andWhere('author.deleted_at IS NULL') // Ensure the author is not soft-deleted
       .getMany();
-  
+
     console.log('Books found:', books);
+
+    // Throw an exception if no books are found
+    if (books.length === 0) {
+      throw new NotFoundException(`No books found for the author: ${authorName}`);
+    }
     return books; // Return the books by the specified author
   }
-  
+
 }
 
 

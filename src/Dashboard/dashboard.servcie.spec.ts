@@ -7,11 +7,17 @@ import { Student } from '../Students/entities/student.entity';
 
 describe('DashboardService', () => {
     let service: DashboardService;
-    const mockBookIssueRepository = {
-        createQueryBuilder: jest.fn().mockReturnThis(),
+
+    const mockGetRawMany = jest.fn();
+    const mockQueryBuilder = {
         select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
         groupBy: jest.fn().mockReturnThis(),
-        getRawMany: jest.fn(),
+        getRawMany: mockGetRawMany,
+    };
+
+    const mockBookIssueRepository = {
+        createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
     };
 
     const mockStudentRepository = {};
@@ -44,7 +50,7 @@ describe('DashboardService', () => {
                 { studentId: 1, issueCount: 2, totalFine: 5 },
                 { studentId: 2, issueCount: 3, totalFine: 10 },
             ];
-            mockBookIssueRepository.getRawMany.mockResolvedValue(mockData);
+            mockGetRawMany.mockResolvedValue(mockData);
 
             const result = await service.getDashboardData();
 
@@ -52,7 +58,8 @@ describe('DashboardService', () => {
                 { studentId: 1, issueCount: 2, totalFine: 5 },
                 { studentId: 2, issueCount: 3, totalFine: 10 },
             ]);
-            expect(mockBookIssueRepository.getRawMany).toHaveBeenCalled();
+            expect(mockBookIssueRepository.createQueryBuilder).toHaveBeenCalledWith("bookIssue");
+            expect(mockQueryBuilder.getRawMany).toHaveBeenCalled();
         });
     });
 });

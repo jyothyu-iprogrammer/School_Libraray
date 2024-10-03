@@ -134,8 +134,8 @@ describe('BookIssueController', () => {
 
   describe('findStudentHistory', () => {
     it('should return an array of book issues for a student', async () => {
-      const studentId = '1'; // Change this to a string
-      const result = await controller.findStudentHistory(studentId); // Pass as a string
+      const studentId = 1; // Use number for student ID
+      const result = await controller.findStudentHistory(studentId.toString()); // Pass as a number
       expect(result).toEqual([
         {
           id: 1,
@@ -171,7 +171,7 @@ describe('BookIssueController', () => {
           }
         }
       ]);
-      expect(service.findStudentHistory).toHaveBeenCalledWith(+studentId); // Pass as a number when calling the service
+      expect(service.findStudentHistory).toHaveBeenCalledWith(studentId);
     });
   });
 });

@@ -36,7 +36,13 @@ let BookIssueService = class BookIssueService {
             if (activeIssue) {
                 throw new common_1.BadRequestException('A student can only issue one book at a time until the previous book is returned.');
             }
-            const newBookIssue = entityManager.create(book_issue_entity_1.BookIssue, Object.assign(Object.assign({}, createBookIssueDto), { issueDate: new Date(), returnDate: null, book: { id: createBookIssueDto.book_id }, student: { id: createBookIssueDto.student_id } }));
+            const newBookIssue = entityManager.create(book_issue_entity_1.BookIssue, {
+                book: { id: createBookIssueDto.book_id },
+                student: { id: createBookIssueDto.student_id },
+                issueDate: new Date(createBookIssueDto.issueDate),
+                returnDate: createBookIssueDto.returnDate ? new Date(createBookIssueDto.returnDate) : null,
+                fine_collected: createBookIssueDto.fine_collected,
+            });
             return await entityManager.save(newBookIssue);
         });
     }

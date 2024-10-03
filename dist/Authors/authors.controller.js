@@ -29,9 +29,6 @@ let AuthorsController = class AuthorsController {
     findByName(name) {
         return this.authorsService.findByName(name);
     }
-    update(id, updateAuthorDto) {
-        return this.authorsService.update(id, updateAuthorDto);
-    }
 };
 exports.AuthorsController = AuthorsController;
 __decorate([
@@ -54,14 +51,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AuthorsController.prototype, "findByName", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, create_author_dto_1.CreateAuthorDto]),
-    __metadata("design:returntype", void 0)
-], AuthorsController.prototype, "update", null);
 exports.AuthorsController = AuthorsController = __decorate([
     (0, common_1.Controller)('authors'),
     __metadata("design:paramtypes", [authors_service_1.AuthorsService])
