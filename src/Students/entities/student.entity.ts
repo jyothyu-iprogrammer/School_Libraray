@@ -15,7 +15,7 @@ export class Student {
   rollNo: string;
 
   @Column()
-  class_level: string;
+  grade: string;
 
   @CreateDateColumn()
   created_at: Date;

@@ -8,8 +8,8 @@ export declare class BookIssueService {
     private readonly bookRepository;
     private readonly studentRepository;
     constructor(bookIssueRepository: Repository<BookIssue>, bookRepository: Repository<Book>, studentRepository: Repository<Student>);
-    create(createBookIssueDtos: CreateBookIssueDto[]): Promise<BookIssue[]>;
-    returnBook(issueId: number, returnDate: string): Promise<BookIssue>;
+    create(createBookIssueDto: CreateBookIssueDto): Promise<BookIssue>;
+    returnBook(studentId: number, bookId: number): Promise<BookIssue>;
     findOne(id: number): Promise<BookIssue>;
     findAll(): Promise<BookIssue[]>;
     findStudentHistory(studentId: number): Promise<BookIssue[]>;

@@ -12,30 +12,34 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StudentService = void 0;
+exports.DashboardService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const student_entity_1 = require("./entities/student.entity");
-let StudentService = class StudentService {
-    constructor(studentRepository) {
+const book_issue_entity_1 = require("../BookIssue/entites/book-issue.entity");
+const student_entity_1 = require("../Students/entities/student.entity");
+let DashboardService = class DashboardService {
+    constructor(bookIssueRepository, studentRepository) {
+        this.bookIssueRepository = bookIssueRepository;
         this.studentRepository = studentRepository;
     }
-    async create(createStudentDto) {
-        const student = this.studentRepository.create(createStudentDto);
-        return this.studentRepository.save(student);
-    }
-    async findAll() {
-        return this.studentRepository.find();
-    }
-    async findOne(id) {
-        return this.studentRepository.findOne({ where: { id } });
+    async getDashboardData() {
+        const dashboardData = await this.bookIssueRepository
+            .createQueryBuilder("bookIssue")
+            .select("bookIssue.student.id", "studentId")
+            .addSelect("COUNT(bookIssue.id)", "issueCount")
+            .addSelect("SUM(bookIssue.fine_collected)", "totalFine")
+            .groupBy("bookIssue.student.id")
+            .getRawMany();
+        return dashboardData;
     }
 };
-exports.StudentService = StudentService;
-exports.StudentService = StudentService = __decorate([
+exports.DashboardService = DashboardService;
+exports.DashboardService = DashboardService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(student_entity_1.Student)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
-], StudentService);
-//# sourceMappingURL=student.service.js.map
+    __param(0, (0, typeorm_1.InjectRepository)(book_issue_entity_1.BookIssue)),
+    __param(1, (0, typeorm_1.InjectRepository)(student_entity_1.Student)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
+], DashboardService);
+//# sourceMappingURL=dashboard.service.js.map

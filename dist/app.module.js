@@ -13,6 +13,7 @@ const authors_module_1 = require("./Authors/authors.module");
 const books_module_1 = require("./Books/books.module");
 const book_issue_module_1 = require("./BookIssue/book-issue.module");
 const student_module_1 = require("./Students/student.module");
+const dashboard_module_1 = require("./Dashboard/dashboard.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -35,6 +36,7 @@ exports.AppModule = AppModule = __decorate([
             books_module_1.BooksModule,
             book_issue_module_1.BookIssueModule,
             student_module_1.StudentModule,
+            dashboard_module_1.DashboardModule
         ],
     })
 ], AppModule);

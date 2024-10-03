@@ -7,5 +7,4 @@ export declare class StudentService {
     create(createStudentDto: CreateStudentDto): Promise<Student>;
     findAll(): Promise<Student[]>;
     findOne(id: number): Promise<Student>;
-    findHistory(studentId: number): Promise<Student>;
 }

@@ -25,19 +25,32 @@ let BookIssueService = class BookIssueService {
         this.bookRepository = bookRepository;
         this.studentRepository = studentRepository;
     }
-    async create(createBookIssueDtos) {
-        const bookIssues = createBookIssueDtos.map(dto => {
-            return this.bookIssueRepository.create(Object.assign(Object.assign({}, dto), { issueDate: new Date(dto.issueDate), book: { id: dto.book_id }, student: { id: dto.student_id } }));
+    async create(createBookIssueDto) {
+        const existingIssue = await this.bookIssueRepository.findOne({
+            where: {
+                student: { id: createBookIssueDto.student_id },
+                returnDate: null,
+            },
         });
-        return await this.bookIssueRepository.save(bookIssues);
-    }
-    async returnBook(issueId, returnDate) {
-        const bookIssue = await this.bookIssueRepository.findOne({ where: { id: issueId } });
-        if (!bookIssue) {
-            throw new common_1.NotFoundException('Book issue record not found');
+        if (existingIssue) {
+            throw new common_1.BadRequestException("A student can only issue one book at a time.");
         }
-        bookIssue.returnDate = new Date(returnDate);
-        return this.bookIssueRepository.save(bookIssue);
+        const bookIssue = this.bookIssueRepository.create(Object.assign(Object.assign({}, createBookIssueDto), { issueDate: new Date(createBookIssueDto.issueDate), book: { id: createBookIssueDto.book_id }, student: { id: createBookIssueDto.student_id } }));
+        return await this.bookIssueRepository.save(bookIssue);
+    }
+    async returnBook(studentId, bookId) {
+        const existingIssue = await this.bookIssueRepository.findOne({
+            where: {
+                student: { id: studentId },
+                book: { id: bookId },
+                returnDate: null,
+            },
+        });
+        if (!existingIssue) {
+            throw new common_1.NotFoundException("No active book issue found for the student.");
+        }
+        existingIssue.returnDate = new Date();
+        return await this.bookIssueRepository.save(existingIssue);
     }
     async findOne(id) {
         const bookIssue = await this.bookIssueRepository.findOne({

@@ -24,11 +24,4 @@ export class StudentService {
     return this.studentRepository.findOne({ where: { id } });
   }
 
-  // Method to find student history
-  async findHistory(studentId: number): Promise<Student> {
-    return this.studentRepository.findOne({
-      where: { id: studentId },
-      relations: ['history'],
-    });
-  }
 }

@@ -6,5 +6,4 @@ export declare class StudentController {
     create(createStudentDto: CreateStudentDto): Promise<import("./entities/student.entity").Student>;
     findAll(): Promise<import("./entities/student.entity").Student[]>;
     findOne(id: string): Promise<import("./entities/student.entity").Student>;
-    findHistory(id: string): Promise<import("./entities/student.entity").Student>;
 }

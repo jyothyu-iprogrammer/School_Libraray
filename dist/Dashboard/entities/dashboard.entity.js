@@ -9,44 +9,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Student = void 0;
+exports.Dashboard = void 0;
 const typeorm_1 = require("typeorm");
-let Student = class Student {
+let Dashboard = class Dashboard {
 };
-exports.Student = Student;
+exports.Dashboard = Dashboard;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], Student.prototype, "id", void 0);
+], Dashboard.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Student.prototype, "name", void 0);
+    __metadata("design:type", Number)
+], Dashboard.prototype, "studentId", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Student.prototype, "email", void 0);
+    __metadata("design:type", Number)
+], Dashboard.prototype, "issueCount", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Student.prototype, "rollNo", void 0);
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Dashboard.prototype, "totalFine", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Student.prototype, "grade", void 0);
-__decorate([
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.Column)({ default: () => 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Date)
-], Student.prototype, "created_at", void 0);
+], Dashboard.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Date)
-], Student.prototype, "updated_at", void 0);
-__decorate([
-    (0, typeorm_1.DeleteDateColumn)({ nullable: true }),
-    __metadata("design:type", Date)
-], Student.prototype, "deleted_at", void 0);
-exports.Student = Student = __decorate([
-    (0, typeorm_1.Entity)('students')
-], Student);
-//# sourceMappingURL=student.entity.js.map
+], Dashboard.prototype, "updatedAt", void 0);
+exports.Dashboard = Dashboard = __decorate([
+    (0, typeorm_1.Entity)()
+], Dashboard);
+//# sourceMappingURL=dashboard.entity.js.map

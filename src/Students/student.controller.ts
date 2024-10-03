@@ -20,9 +20,4 @@ export class StudentController {
   findOne(@Param('id') id: string) {
     return this.studentService.findOne(+id);
   }
-
-  @Get(':id/history')
-  findHistory(@Param('id') id: string) {
-    return this.studentService.findHistory(+id);
-  }
 }

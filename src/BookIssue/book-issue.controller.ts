@@ -8,8 +8,22 @@ export class BookIssueController {
   constructor(private readonly bookIssueService: BookIssueService) { }
 
   @Post()
-  async create(@Body() createBookIssueDtos: CreateBookIssueDto[]): Promise<BookIssue[]> {
-    return this.bookIssueService.create(createBookIssueDtos);
+  async create(
+    @Body() createBookIssueDtos: CreateBookIssueDto | CreateBookIssueDto[]
+  ): Promise<BookIssue[]> {
+    if (Array.isArray(createBookIssueDtos)) {
+      // Handle an array of book issue requests
+      const bookIssues = [];
+      for (const dto of createBookIssueDtos) {
+        const bookIssue = await this.bookIssueService.create(dto);
+        bookIssues.push(bookIssue);
+      }
+      return bookIssues; // Return the array of created book issues
+    } else {
+      // Handle a single book issue request
+      const bookIssue = await this.bookIssueService.create(createBookIssueDtos);
+      return [bookIssue]; // Return an array with a single book issue
+    }
   }
 
   @Get(':id')
@@ -32,12 +46,9 @@ export class BookIssueController {
     return this.bookIssueService.findStudentHistory(+studentId);
   }
 
-  @Patch('/return/:issueId')
-  async returnBook(
-    @Param('issueId') issueId: number,
-    @Body('returnDate') returnDate: string
-  ): Promise<BookIssue> {
-    return this.bookIssueService.returnBook(issueId, returnDate);
+   @Post('/return')
+  async return(@Body() returnDto: { student_id: number; book_id: number }): Promise<BookIssue> {
+    return this.bookIssueService.returnBook(returnDto.student_id, returnDto.book_id);
   }
 
 }

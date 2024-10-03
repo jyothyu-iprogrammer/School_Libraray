@@ -20,7 +20,18 @@ let BookIssueController = class BookIssueController {
         this.bookIssueService = bookIssueService;
     }
     async create(createBookIssueDtos) {
-        return this.bookIssueService.create(createBookIssueDtos);
+        if (Array.isArray(createBookIssueDtos)) {
+            const bookIssues = [];
+            for (const dto of createBookIssueDtos) {
+                const bookIssue = await this.bookIssueService.create(dto);
+                bookIssues.push(bookIssue);
+            }
+            return bookIssues;
+        }
+        else {
+            const bookIssue = await this.bookIssueService.create(createBookIssueDtos);
+            return [bookIssue];
+        }
     }
     async findOne(id) {
         const bookIssue = await this.bookIssueService.findOne(+id);
@@ -35,8 +46,8 @@ let BookIssueController = class BookIssueController {
     async findStudentHistory(studentId) {
         return this.bookIssueService.findStudentHistory(+studentId);
     }
-    async returnBook(issueId, returnDate) {
-        return this.bookIssueService.returnBook(issueId, returnDate);
+    async return(returnDto) {
+        return this.bookIssueService.returnBook(returnDto.student_id, returnDto.book_id);
     }
 };
 exports.BookIssueController = BookIssueController;
@@ -44,7 +55,7 @@ __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Array]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BookIssueController.prototype, "create", null);
 __decorate([
@@ -68,13 +79,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BookIssueController.prototype, "findStudentHistory", null);
 __decorate([
-    (0, common_1.Patch)('/return/:issueId'),
-    __param(0, (0, common_1.Param)('issueId')),
-    __param(1, (0, common_1.Body)('returnDate')),
+    (0, common_1.Post)('/return'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], BookIssueController.prototype, "returnBook", null);
+], BookIssueController.prototype, "return", null);
 exports.BookIssueController = BookIssueController = __decorate([
     (0, common_1.Controller)('book-issues'),
     __metadata("design:paramtypes", [book_issue_service_1.BookIssueService])

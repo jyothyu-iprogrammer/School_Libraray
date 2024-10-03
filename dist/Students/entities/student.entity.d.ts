@@ -3,7 +3,7 @@ export declare class Student {
     name: string;
     email: string;
     rollNo: string;
-    class_level: string;
+    grade: string;
     created_at: Date;
     updated_at: Date;
     deleted_at: Date;
