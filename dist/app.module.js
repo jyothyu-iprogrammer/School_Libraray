@@ -9,10 +9,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const authors_module_1 = require("./authors/authors.module");
-const books_module_1 = require("./books/books.module");
-const book_issue_module_1 = require("./book-issue/book-issue.module");
-const student_module_1 = require("./students/student.module");
+const authors_module_1 = require("./Authors/authors.module");
+const books_module_1 = require("./Books/books.module");
+const book_issue_module_1 = require("./BookIssue/book-issue.module");
+const student_module_1 = require("./Students/student.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;

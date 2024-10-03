@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthorsModule } from './authors/authors.module';
-import { BooksModule } from './books/books.module';
-import { BookIssueModule } from './book-issue/book-issue.module';
-import { StudentModule } from './students/student.module';
+import { AuthorsModule } from './Authors/authors.module';
+import { BooksModule } from './Books/books.module';
+import { BookIssueModule } from './BookIssue/book-issue.module';
+import { StudentModule } from './Students/student.module';
 
 @Module({
   imports: [
